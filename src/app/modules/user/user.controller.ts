@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { StudentValidation } from './student.validation';
 import { UserService } from './user.service';
+import bcrypt from 'bcrypt';
+import config from '../../config';
 
 const validation = async (
   validationSchema: z.ZodSchema,
@@ -15,15 +17,26 @@ const createUser = async (req: Request, res: Response) => {
       StudentValidation.createUserValidationSchema,
       body,
     );
-
+    validationRes.password = await bcrypt.hash(
+      validationRes.password,
+      Number(config.bcrypt_salt),
+    );
+    console.log('validationRes', validationRes);
     const result = await UserService.addSingleUserToDB(validationRes);
+    const finalRes: Record<string, unknown> = JSON.parse(
+      JSON.stringify(result),
+    );
+    console.log('finalRes', finalRes);
+    delete finalRes.password;
+    delete finalRes.orders;
 
     return res.status(200).json({
       success: true,
       message: 'Successfully created user',
-      data: result,
+      data: finalRes,
     });
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     console.log('Create user Error=>', error);
     if (error instanceof z.ZodError) {
       return res.status(400).json({
@@ -33,6 +46,15 @@ const createUser = async (req: Request, res: Response) => {
           code: 400,
           description: 'Zod validation Error',
           error: error.format(),
+        },
+      });
+    } else if (error.message === 'User already exists') {
+      return res.status(400).json({
+        success: false,
+        message: 'User already exists',
+        error: {
+          code: 400,
+          description: 'User already exists',
         },
       });
     }

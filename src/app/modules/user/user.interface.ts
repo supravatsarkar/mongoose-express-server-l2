@@ -1,3 +1,5 @@
+import { Model } from 'mongoose';
+
 export interface TOrder {
   productName: string;
   price: number;
@@ -23,4 +25,9 @@ export interface TUser {
   hobbies: string[];
   address: TAddress;
   orders: Array<TOrder>;
+}
+
+export interface TUserModel extends Model<TUser> {
+  // eslint-disable-next-line no-unused-vars
+  isUserExist(id: number | string): Promise<TUser> | null;
 }

@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { TUser, TAddress, TOrder } from './user.interface';
+import { TUser, TAddress, TOrder, TUserModel } from './user.interface';
 
 const addressSchema = new Schema<TAddress>({
   street: {
@@ -30,7 +30,7 @@ const orderSchema = new Schema<TOrder>({
   },
 });
 
-const userSchema = new Schema<TUser>(
+const userSchema = new Schema<TUser, TUserModel>(
   {
     userId: {
       type: Number,
@@ -41,6 +41,10 @@ const userSchema = new Schema<TUser>(
       type: String,
       required: true,
       unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
     },
     fullName: {
       type: new Schema({
@@ -86,4 +90,8 @@ const userSchema = new Schema<TUser>(
   { timestamps: true },
 );
 
-export const UserModel = model<TUser>('user', userSchema);
+userSchema.statics.isUserExist = async (userId: number) => {
+  return UserModel.findOne({ userId });
+};
+
+export const UserModel = model<TUser, TUserModel>('user', userSchema);
