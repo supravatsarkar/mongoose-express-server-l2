@@ -74,22 +74,46 @@ const getUsers = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Successfully created user',
+      message: 'Users fetched successfully!',
       data: result,
     });
   } catch (error) {
-    console.log('Create user Error=>', error);
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
+    console.log('Error=>', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong!',
+      error: {
+        code: 500,
+        description: 'Something went wrong!',
+      },
+    });
+  }
+};
+const getUserByUserId = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const result = await UserService.getUserById(Number(userId));
+    // console.log('result', result);
+    if (!result) {
+      return res.status(404).json({
         success: false,
-        message: 'Validation Error',
+        message: 'User not found!',
         error: {
-          code: 400,
-          description: 'Zod validation Error',
-          error: error.format(),
+          code: 404,
+          description: 'User not found!',
         },
       });
     }
+
+    return res.status(200).json({
+      success: true,
+      message: 'User fetched successfully!',
+      data: result,
+    });
+  } catch (error) {
+    console.log('Error=>', error);
+
     return res.status(500).json({
       success: false,
       message: 'Something went wrong!',
@@ -104,4 +128,5 @@ const getUsers = async (req: Request, res: Response) => {
 export const StudentController = {
   createUser,
   getUsers,
+  getUserByUserId,
 };
