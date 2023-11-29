@@ -4,8 +4,11 @@ import config from './app/config';
 
 async function main() {
   try {
+    // db connection
     await mongoose.connect(config.db_uri as string);
     console.log('DB connected..');
+
+    // app start
     app.listen(config.port, () => {
       console.log('App running on port', config.port);
     });
@@ -13,4 +16,4 @@ async function main() {
     console.log('Main Error', error);
   }
 }
-main();
+main(); // start app

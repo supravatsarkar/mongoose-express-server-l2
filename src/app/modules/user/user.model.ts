@@ -43,14 +43,16 @@ const userSchema = new Schema<TUser>(
       unique: true,
     },
     fullName: {
-      firstName: {
-        type: String,
-        required: true,
-      },
-      lastName: {
-        type: String,
-        required: true,
-      },
+      type: new Schema({
+        firstName: {
+          type: String,
+          required: true,
+        },
+        lastName: {
+          type: String,
+          required: true,
+        },
+      }),
       required: true,
     },
     age: {
