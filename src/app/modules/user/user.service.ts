@@ -121,6 +121,19 @@ async function addProductToUser(userId: number, productData: TOrder) {
     { $addToSet: { orders: productData } },
   );
 }
+async function getOrderByUserId(userId: number) {
+  return await UserModel.aggregate([
+    {
+      $match: { userId },
+    },
+    {
+      $project: {
+        _id: 0,
+        orders: { productName: 1, quantity: 1, price: 1 },
+      },
+    },
+  ]);
+}
 
 export const UserService = {
   addSingleUserToDB,
@@ -130,4 +143,5 @@ export const UserService = {
   updateSingleUserByUserId,
   deleteSingleUserByUserId,
   addProductToUser,
+  getOrderByUserId,
 };

@@ -8,5 +8,6 @@ router.get('/:userId', StudentController.getUserByUserId);
 router.put('/:userId', StudentController.updateSingleUserByUserId);
 router.delete('/:userId', StudentController.deleteSingleUserByUserId);
 router.put('/:userId/orders', StudentController.addProduct);
+router.get('/:userId/orders', StudentController.getOrderByUserId);
 
 export default router;
