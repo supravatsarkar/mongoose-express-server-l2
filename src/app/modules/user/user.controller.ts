@@ -347,6 +347,63 @@ const getOrderByUserId = async (req: Request, res: Response) => {
     });
   }
 };
+const getOrderTotalPriceByUserId = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const user = await UserModel.findOne({ userId });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found!',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+
+    if (user.orders && user.orders.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No orders found!',
+        error: {
+          code: 404,
+          description: 'No orders found!',
+        },
+      });
+    }
+
+    const result = await UserService.getOrderTotalPriceByUserId(Number(userId));
+    return res.status(200).json({
+      success: true,
+      message: 'Total price calculated successfully!',
+      data: result,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.log('Error=>', error);
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation Error',
+        error: {
+          code: 400,
+          description: 'Zod validation Error',
+          error: error.format(),
+        },
+      });
+    }
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong!',
+      error: {
+        code: 500,
+        description: 'Something went wrong!',
+      },
+    });
+  }
+};
 
 export const StudentController = {
   createUser,
@@ -356,4 +413,5 @@ export const StudentController = {
   deleteSingleUserByUserId,
   addProduct,
   getOrderByUserId,
+  getOrderTotalPriceByUserId,
 };

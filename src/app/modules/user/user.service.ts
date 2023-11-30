@@ -134,6 +134,38 @@ async function getOrderByUserId(userId: number) {
     },
   ]);
 }
+async function getOrderTotalPriceByUserId(userId: number) {
+  return await UserModel.aggregate([
+    {
+      $match: { userId },
+    },
+    {
+      $project: {
+        _id: 0,
+        orders: { productName: 1, quantity: 1, price: 1 },
+      },
+    },
+    {
+      $unwind: '$orders',
+    },
+    {
+      $project: {
+        total: { $multiply: ['$orders.quantity', '$orders.price'] },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalPrice: { $sum: '$total' },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+  ]);
+}
 
 export const UserService = {
   addSingleUserToDB,
@@ -144,4 +176,5 @@ export const UserService = {
   deleteSingleUserByUserId,
   addProductToUser,
   getOrderByUserId,
+  getOrderTotalPriceByUserId,
 };
