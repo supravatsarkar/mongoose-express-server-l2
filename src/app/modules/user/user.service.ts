@@ -1,4 +1,4 @@
-import { TUser } from './user.interface';
+import { TOrder, TUser } from './user.interface';
 import { UserModel } from './user.model';
 
 async function addSingleUserToDB(userData: TUser) {
@@ -115,6 +115,12 @@ async function deleteSingleUserByUserId(userId: number) {
   }
   return await UserModel.updateOne({ userId }, { isDeleted: true });
 }
+async function addProductToUser(userId: number, productData: TOrder) {
+  return await UserModel.updateOne(
+    { userId },
+    { $addToSet: { orders: productData } },
+  );
+}
 
 export const UserService = {
   addSingleUserToDB,
@@ -123,4 +129,5 @@ export const UserService = {
   getUserById,
   updateSingleUserByUserId,
   deleteSingleUserByUserId,
+  addProductToUser,
 };

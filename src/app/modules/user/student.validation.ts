@@ -61,9 +61,16 @@ const updateUserValidationSchema = z.object({
     .optional(),
 });
 
+const addProductValidationSchema = z.object({
+  productName: z.string(),
+  price: z.number(),
+  quantity: z.number(),
+});
+
 // console.log(createUserValidationSchema instanceof z.ZodSchema);
 
 export const StudentValidation = {
   createUserValidationSchema,
   updateUserValidationSchema,
+  addProductValidationSchema,
 };

@@ -4,6 +4,7 @@ import { StudentValidation } from './student.validation';
 import { UserService } from './user.service';
 import bcrypt from 'bcrypt';
 import config from '../../config';
+import { UserModel } from './user.model';
 
 const validation = async (
   validationSchema: z.ZodSchema,
@@ -237,10 +238,76 @@ const deleteSingleUserByUserId = async (req: Request, res: Response) => {
   }
 };
 
+const addProduct = async (req: Request, res: Response) => {
+  try {
+    const body = req.body;
+    const { userId } = req.params;
+    const validationRes = await validation(
+      StudentValidation.addProductValidationSchema,
+      body,
+    );
+    if (!(await UserModel.findOne({ userId }))) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found!',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+
+    const result = await UserService.addProductToUser(
+      Number(userId),
+      validationRes,
+    );
+    if (result.acknowledged && result.modifiedCount > 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'Order created successfully!',
+        data: null,
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to create order!',
+        error: {
+          code: 500,
+          description: 'Failed to create order',
+        },
+      });
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.log('Error=>', error);
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation Error',
+        error: {
+          code: 400,
+          description: 'Zod validation Error',
+          error: error.format(),
+        },
+      });
+    }
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong!',
+      error: {
+        code: 500,
+        description: 'Something went wrong!',
+      },
+    });
+  }
+};
+
 export const StudentController = {
   createUser,
   getUsers,
   getUserByUserId,
   updateSingleUserByUserId,
   deleteSingleUserByUserId,
+  addProduct,
 };
