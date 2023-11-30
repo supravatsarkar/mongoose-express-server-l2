@@ -5,5 +5,7 @@ const router: Router = express.Router();
 router.post('/', StudentController.createUser);
 router.get('/', StudentController.getUsers);
 router.get('/:userId', StudentController.getUserByUserId);
+router.put('/:userId', StudentController.updateSingleUserByUserId);
+router.delete('/:userId', StudentController.deleteSingleUserByUserId);
 
 export default router;

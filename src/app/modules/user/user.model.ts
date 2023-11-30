@@ -86,6 +86,10 @@ const userSchema = new Schema<TUser, TUserModel>(
       required: true,
       default: [],
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );
@@ -93,5 +97,25 @@ const userSchema = new Schema<TUser, TUserModel>(
 userSchema.statics.isUserExist = async (userId: number) => {
   return UserModel.findOne({ userId });
 };
+
+userSchema.pre('save', async function (next) {
+  const exit = await UserModel.find().or([
+    { userId: this.userId },
+    { username: this.username },
+  ]);
+  if (exit) {
+    throw new Error('Duplicate userId or username');
+  }
+  next();
+});
+userSchema.pre('findOne', function (next) {
+  this.findOne({ isDeleted: { $ne: true } });
+  next();
+});
+userSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  console.log('is this run');
+  next();
+});
 
 export const UserModel = model<TUser, TUserModel>('user', userSchema);
