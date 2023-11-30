@@ -14,7 +14,10 @@ app.use(express_1.default.json());
 // routes
 app.use('/api/users', user_routes_1.default);
 app.get('/', (req, res) => {
-    res.status(200).send('Server Running..');
+    res.status(200).send({
+        success: true,
+        message: "'Server Running....",
+    });
 });
 // 404 handler
 app.all('*', (req, res) => {

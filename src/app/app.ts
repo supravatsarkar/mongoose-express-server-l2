@@ -13,7 +13,10 @@ app.use(express.json());
 app.use('/api/users', StudentRoutes);
 
 app.get('/', (req: Request, res: Response) => {
-  res.status(200).send('Server Running..');
+  res.status(200).send({
+    success: true,
+    message: "'Server Running....",
+  });
 });
 
 // 404 handler
