@@ -1,6 +1,6 @@
 # Mongoose Express Server Using TypeScript
 
-**Live Server Host**
+**Live Server Host** https://tired-crow-blazer.cyclic.app
 
 ### How to Start Project in local
 
