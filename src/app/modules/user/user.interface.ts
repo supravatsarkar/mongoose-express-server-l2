@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 export interface TOrder {
   productName: string;
@@ -29,6 +29,10 @@ export interface TUser {
 }
 
 export interface TUserModel extends Model<TUser> {
-  // eslint-disable-next-line no-unused-vars
-  isUserExist(id: number | string): Promise<TUser> | null;
+  isUserExist(
+    // eslint-disable-next-line no-unused-vars
+    id: number | string,
+  ): Promise<
+    TUser & { _id: Types.ObjectId; createdAt: Date; updatedAt: Date }
+  > | null;
 }

@@ -99,11 +99,12 @@ userSchema.statics.isUserExist = async (userId: number) => {
 };
 
 userSchema.pre('save', async function (next) {
-  const exit = await UserModel.find().or([
+  const exit = await UserModel.findOne().or([
     { userId: this.userId },
     { username: this.username },
   ]);
   if (exit) {
+    console.log('Exist user=>', exit);
     throw new Error('Duplicate userId or username');
   }
   next();

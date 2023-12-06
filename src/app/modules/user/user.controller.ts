@@ -18,22 +18,29 @@ const createUser = async (req: Request, res: Response) => {
       StudentValidation.createUserValidationSchema,
       body,
     );
+    console.log('validationRes', validationRes);
     validationRes.password = await bcrypt.hash(
       validationRes.password,
       Number(config.bcrypt_salt),
     );
-    console.log('validationRes', validationRes);
     const result = await UserService.addSingleUserToDB(validationRes);
-    const finalRes: Record<string, unknown> = JSON.parse(
-      JSON.stringify(result),
-    );
+    const finalRes = JSON.parse(JSON.stringify(result));
     console.log('finalRes', finalRes);
+
+    // deleting unwanted fields from response
     delete finalRes.password;
     delete finalRes.orders;
+    delete finalRes.isDeleted;
+    delete finalRes._id;
+    delete finalRes.createdAt;
+    delete finalRes.updatedAt;
+    delete finalRes.__v;
+    delete finalRes.fullName._id;
+    delete finalRes.address._id;
 
     return res.status(200).json({
       success: true,
-      message: 'Successfully created user',
+      message: 'User created successfully!',
       data: finalRes,
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -139,12 +146,14 @@ const updateSingleUserByUserId = async (req: Request, res: Response) => {
       StudentValidation.updateUserValidationSchema,
       body,
     );
+    // if want to update password then we need to hash the password
     if (validationRes.password) {
       validationRes.password = await bcrypt.hash(
         validationRes.password,
         Number(config.bcrypt_salt),
       );
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await UserService.updateSingleUserByUserId(
       Number(userId),
       validationRes,
@@ -159,12 +168,25 @@ const updateSingleUserByUserId = async (req: Request, res: Response) => {
         },
       });
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const finalRes: Record<string, any> = result.toObject();
     console.log('result', result);
+
+    // remote unwanted field from response
+    delete finalRes.password;
+    delete finalRes.orders;
+    delete finalRes.isDeleted;
+    delete finalRes._id;
+    delete finalRes.createdAt;
+    delete finalRes.updatedAt;
+    delete finalRes.__v;
+    delete finalRes.fullName._id;
+    delete finalRes.address._id;
 
     return res.status(200).json({
       success: true,
       message: 'User updated successfully!',
-      data: result,
+      data: finalRes,
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -194,7 +216,7 @@ const updateSingleUserByUserId = async (req: Request, res: Response) => {
     }
     return res.status(500).json({
       success: false,
-      message: 'Something went wrong!',
+      message: error.message || 'Something went wrong!',
       error: {
         code: 500,
         description: 'Something went wrong!',
@@ -222,7 +244,7 @@ const deleteSingleUserByUserId = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: 'User deleted successfully!',
-      data: result,
+      data: null,
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

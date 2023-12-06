@@ -34,8 +34,8 @@ const updateUserValidationSchema = z.object({
   password: z.string().optional(),
   fullName: z
     .object({
-      firstName: z.string().optional(),
-      lastName: z.string().optional(),
+      firstName: z.string(),
+      lastName: z.string(),
     })
     .optional(),
   age: z.number().optional(),
